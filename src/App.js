@@ -10,49 +10,8 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import './App.css';
 
 
-const setupClarifai = (imageUrl) => {
 
-  // Your PAT (Personal Access Token) can be found in the Account's Security section
-  const PAT = 'fc7d0cdd35754a598b040ddd372a8ad3';
-  // Specify the correct user_id/app_id pairings
-  // Since you're making inferences outside your app's scope
-  const USER_ID = 'i9ufkd1cgej1';
-  const APP_ID = 'test';
-  // Change these to whatever model and image URL you want to use
-  
-  //const MODEL_ID = 'face-detection';
-  const IMAGE_URL = imageUrl;
-  
-  
-  const raw = JSON.stringify({
-    "user_app_id": {
-        "user_id": USER_ID,
-        "app_id": APP_ID
-    },
-    "inputs": [
-        {
-            "data": {
-                "image": {
-                    "url": IMAGE_URL
-                    // "base64": IMAGE_BYTES_STRING
-                }
-            }
-        }
-    ]
-  });
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Key ' + PAT
-    },
-    body: raw
-  };
-  return requestOptions;
-  
-  }
-
-
+const apiUrl= process.env.REACT_APP_API_URL;
 
 
 
@@ -100,15 +59,16 @@ class App extends Component {
   }
   
   onSubmit = () => {
+    
     this.setState({imageUrl: this.state.input});
-    fetch("/v2/models/face-detection/outputs", setupClarifai(this.state.input))
-    /* fetch('https://lit-gorge-92759-57dcdc141843.herokuapp.com/imageu',{
+    
+    fetch(`${apiUrl}/faced`,{
       method: 'post',
       headers : {'Content-Type': 'application/json'},
       body: JSON.stringify({
         input: this.state.input
       })
-    })*/
+    })
     .then(response => response.json())
     .then(result => {
       console.log(result) 
@@ -118,7 +78,7 @@ class App extends Component {
         const regions = result.outputs[0].data.regions;
 
         if (result){
-          fetch('https://lit-gorge-92759-57dcdc141843.herokuapp.com/image',{
+          fetch(`${apiUrl}/image`,{
             method: 'put',
             headers : {'Content-Type': 'application/json'},
             body: JSON.stringify({
